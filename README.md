@@ -21,7 +21,7 @@ docker compose up --build
 - Web (nginx): http://localhost:4173  
 - RabbitMQ UI: http://localhost:15672  
 
-## Desenvolvimento local (sem Docker Compose completo)
+## Desenvolvimento local
 
 - **API:** `cd api && ./mvnw spring-boot:run` (Windows: `mvnw.cmd`)  
 - **Web:** `cd web && npm install && npm run dev`  
