@@ -51,6 +51,19 @@ Vite proxies `/api` requests to `http://localhost:8080` (see `vite.config.ts`).
 - Web: http://localhost:5173
 - RabbitMQ Management: http://localhost:15672 (user: `orderflow` / pass: `orderflow123`)
 
+### Full Docker development (with hot reload)
+
+```bash
+sudo docker compose up --build
+```
+
+This starts all services with hot reload enabled:
+- **API**: `dev-entrypoint.sh` uses `inotifywait` to watch `src/` for `.java`/`.properties`/`.xml` changes, triggers `mvn compile`, and DevTools auto-restarts the app (~0.5s).
+- **Web**: Runs Vite dev server (not nginx) with full HMR via volume-mounted source files.
+- **Debug port**: JDWP on port 5005 (controlled by `SPRING_BOOT_JVM_ARGS` env var).
+
+The `vite.config.ts` reads `API_PROXY_TARGET` env var (defaults to `http://localhost:8080`). In Docker Compose it's set to `http://app:8080`.
+
 ### Non-obvious notes
 
 - Security is currently set to `permitAll()` — no auth required for any endpoint.
@@ -58,3 +71,4 @@ Vite proxies `/api` requests to `http://localhost:8080` (see `vite.config.ts`).
 - Hibernate `ddl-auto=update` auto-creates schema on first run — no migration step needed.
 - The `application-local.properties` file (added for Cloud dev) overrides DB/RabbitMQ hosts to `localhost`. If you need to run the API inside Docker Compose, use `-Dspring-boot.run.profiles=docker` instead.
 - `spring-boot-devtools` is enabled: the API auto-restarts on class changes, but not on `pom.xml` changes.
+- The original `web/Dockerfile` is for production (build + nginx). `web/Dockerfile.dev` is for development with HMR.
