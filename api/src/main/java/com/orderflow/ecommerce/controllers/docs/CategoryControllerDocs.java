@@ -7,13 +7,10 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
@@ -60,7 +57,7 @@ public interface CategoryControllerDocs {
     @Operation(
         summary = "Cria uma categoria",
         description = "Insere uma nova categoria no sistema. O campo 'id' deve ser omitido no envio.",
-        requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+        requestBody = @RequestBody(
             description = "Dados da categoria a ser criada",
             required = true,
             content = @Content(schema = @Schema(implementation = Category.class))
@@ -112,7 +109,7 @@ public interface CategoryControllerDocs {
                 example = "1"
             )
         },
-        requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+        requestBody = @RequestBody(
             description = "Novos dados para atualização da categoria",
             required = true,
             content = @Content(schema = @Schema(implementation = Category.class))
