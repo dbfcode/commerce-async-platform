@@ -407,6 +407,74 @@ cd web && npm run build
 
 ---
 
+## Contribution Workflow · Como contribuir
+
+Para manter o monorepo organizado e o histórico do Git limpo, adotamos padrões estritos para a nomenclatura de **branches** e **mensagens de commit** (baseado em Conventional Commits).
+
+---
+
+### Branch Naming · Padrão de Branches
+
+Toda nova alteração deve partir da branch principal utilizando a seguinte estrutura em **inglês** e com letras **minúsculas**:
+
+#### Formato
+```
+padrão: [tipo-abreviado]/[escopo-opcional]-[breve-descrição]
+```
+
+#### Tipos Permitidos (Prefixos)
+* `feat/` : Nova funcionalidade (ex: `feat/cart-page`)
+* `fix/` : Correção de bug (ex: `fix/rabbitmq-retry`)
+* `docs/` : Alterações exclusivas de documentação (ex: `docs/separate-swagger-docs`)
+* `refactor/` : Refatoração de código que não altera o comportamento (ex: `refactor/clean-controllers`)
+* `chore/` : Atualizações de build, dependências ou ferramentas (ex: `chore/update-docker-compose`)
+
+---
+
+### Semantic Commits · Commits Semânticos
+
+As mensagens de commit devem ser escritas obrigatoriamente em **inglês**, utilizando letras **minúsculas** e o verbo no **imperativo** (ex: *add*, *fix*, *remove*, em vez de *added*, *fixed*, *removing*).
+
+#### Formato
+```
+padrão: [tipo-abreviado](escopo): <descrição-curta>
+```
+
+#### Tabela de Tipos e Escopos
+
+| Tipo | Uso | Escopo | Significado |
+|:-----|:----| :--- | :--- |
+| **feat**     | Nova funcionalidade | **auth** | Autenticação, JWT |
+| **fix**      | Correção de bug | **produto** | CRUD de produtos |
+| **docs**     | Documentação | **categoria** | CRUD de categorias |
+| **style**    | Formatação, espaços, lint (não altera código) | **usuario** | CRUD de usuários |
+| **refactor** | Refatoração de código | **carrinho** | Carrinho de compras |
+| **test**     | Adicionar ou corrigir testes | **pedido** | Checkout e pedidos |
+| **chore**    | Configuração, dependências, build | **messaging** | Fila, RabbitMQ, consumidores |
+| **chore**    | Configuração, dependências, build | **docker** | Dockerfile, docker-compose |
+| **chore**    | Configuração, dependências, build | **infra** | Configurações gerais |
+
+#### Exemplos Práticos · Examples
+
+* **Funcionalidades e Correções:**
+    * `feat(auth): implement login with JWT`
+    * `feat(messaging): configure RabbitMQ and publish order event`
+    * `fix(carrinho): avoid duplicate items in cart`
+    * `fix(auth): fix expired token validation`
+
+* **Refatoração, Testes e Outros:**
+    * `refactor(produto): extract validation logic to service`
+    * `test(pedido): add integration tests with testcontainers`
+    * `docs: add architecture diagram to README`
+    * `chore: configure docker-compose with PostgreSQL and RabbitMQ`
+
+#### Regras de Ouro
+1. **Inglês sempre!**
+2. **Minúsculo** – Tudo em letras minúsculas.
+3. **Imperativo** – "add" e não "added" ou "adding".
+4. **Curto** – Até 50 caracteres na mensagem principal.
+5. **Sem ponto final** – Não termine a linha de resumo com ponto `.`.
+
 ## Contributors · Colaboradores
 
 | Name | Role | Contributions |
