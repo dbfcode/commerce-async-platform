@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   postgres:
     image: postgres:15
@@ -6,6 +8,8 @@ services:
       POSTGRES_DB: orderflow
       POSTGRES_USER: orderflow
       POSTGRES_PASSWORD: orderflow123
+      SPRING_DEVTOOLS_RESTART_POLL_INTERVAL: "2000"
+      SPRING_DEVTOOLS_RESTART_QUIET_PERIOD: "1000"
     ports:
       - "5432:5432"
     volumes:
@@ -53,7 +57,8 @@ services:
       SPRING_RABBITMQ_PASSWORD: orderflow123
       SPRING_DEVTOOLS_RESTART_ENABLED: "true"
       SPRING_DEVTOOLS_LIVERELOAD_ENABLED: "true"
-      SPRING_BOOT_JVM_ARGS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
+      # Debug apenas no processo filho (fork do spring-boot:run)
+      MAVEN_OPTS: "-Dspring-boot.run.jvmArguments=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
     ports:
       - "8080:8080"
       - "5005:5005"
@@ -74,17 +79,12 @@ services:
   web:
     build:
       context: ./web
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: /api
     container_name: orderflow-web
-    environment:
-      VITE_API_BASE_URL: /api
-      API_PROXY_TARGET: http://app:8080
     ports:
-      - "5173:5173"
-    volumes:
-      - ./web/src:/app/src
-      - ./web/index.html:/app/index.html
-      - ./web/vite.config.ts:/app/vite.config.ts
+      - "4173:80"
     depends_on:
       app:
         condition: service_started
