@@ -1,4 +1,4 @@
-# OrderFlow Commerce
+# OrderFlow Commerce - Collaborative Team Portfolio Project
 
 <p align="center">
   <img width="1536" height="1024" alt="OrderFlow Commerce" src="https://github.com/user-attachments/assets/55231973-4991-4e35-95c3-aac612f0bcbc" />
