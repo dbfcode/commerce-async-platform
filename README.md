@@ -27,7 +27,6 @@
 | **Diego Ferreira** | Coordinator and Developer | RabbitMQ, checkout, Docker, architecture, Java, Spring boot, React, Redis |
 | **Pablo Santos** | Developer | React, Front-end, TypeScript & JavaScript |
 | **Max Zimmermann** | Developer | Java, Spring Boot, CRUDs, JWT auth, cart, Swagger, Docs |
-| **Giovanna Caxias** | Junior Developer | CRUD, JWT auth, cart, Swagger |
 
 ---
 
