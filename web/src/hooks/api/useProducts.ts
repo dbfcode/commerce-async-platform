@@ -12,7 +12,7 @@ import { useEffect, useState } from "react";
     price: number;
   };
 
-  export default function Home() {
+  export default function useProducts() {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -24,7 +24,7 @@ import { useEffect, useState } from "react";
 
       console.log("Buscando produtos...");
 
-      const res = await fetch("http://localhost:8081/products");
+      const res = await fetch("http://localhost:8080/products");
 
       if (!res.ok) throw new Error("Erro ao buscar produtos");
 
