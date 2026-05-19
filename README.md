@@ -479,7 +479,9 @@ padrão: [tipo-abreviado](escopo): <descrição-curta>
 
 | Name | Role | Contributions |
 |------|------|---------------|
-| **Diego Ferreira** | Advanced Developer | RabbitMQ, checkout, Docker, architecture |
+| **Diego Ferreira** | Coordinator | Developer | RabbitMQ, checkout, Docker, architecture, Java, Spring boot, React, Redis |
+| **Pablo Santos** | Developer | React | Front-end | TypeScript & JavaScript |
+| **Max Zimmerman** | Developer | Java, Spring boot CRUDs, JWT auth, cart, Swagger |
 | **Giovanna Caxias** | Junior Developer | CRUD, JWT auth, cart, Swagger |
 
 ---
