@@ -18,7 +18,5 @@ public class Category {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    @NotBlank(message = "O nome da categoria é obrigatório")
-    @Pattern(regexp = "^[a-zA-ZÀ-ÿ ]+$", message = "O nome deve conter apenas letras")
     private String name;
 }
