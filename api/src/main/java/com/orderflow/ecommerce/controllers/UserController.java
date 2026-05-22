@@ -2,6 +2,7 @@ package com.orderflow.ecommerce.controllers;
 
 import com.orderflow.ecommerce.dtos.UserDto;
 import com.orderflow.ecommerce.services.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,8 +35,9 @@ public class UserController {
         return ResponseEntity.ok().body(service.findByEmail(email));
     }
 
+    @Valid
     @PostMapping
-    public ResponseEntity<UserDto> insert(@RequestBody UserDto dto) {
+    public ResponseEntity<UserDto> insert(@Valid @RequestBody UserDto dto) {
         dto = service.insert(dto);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(dto.id()).toUri();
@@ -49,7 +51,7 @@ public class UserController {
     }
 
     @PutMapping(value = "/{id}")
-    public ResponseEntity<UserDto> update(@PathVariable Long id, @RequestBody UserDto dto) {
+    public ResponseEntity<UserDto> update(@PathVariable Long id, @Valid @RequestBody UserDto dto) {
         return ResponseEntity.ok().body(service.update(id, dto));
     }
 }

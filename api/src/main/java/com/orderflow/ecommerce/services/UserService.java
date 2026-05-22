@@ -2,18 +2,15 @@ package com.orderflow.ecommerce.services;
 
 import com.orderflow.ecommerce.dtos.UserDto;
 import com.orderflow.ecommerce.entities.User;
+import com.orderflow.ecommerce.exceptions.DuplicateResourceException;
 import com.orderflow.ecommerce.repositories.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.NoSuchElementException;
 
@@ -65,7 +62,23 @@ public class UserService {
     private User saveEntity(Long id, UserDto dto) {
         User entity = new User();
 
-        if(id != null) entity = repository.getReferenceById(id);
+        if(id != null){ // if updating
+            entity = repository.getReferenceById(id);
+            if (repository.existsByEmailAndIdNot(dto.email(), id)) {
+                throw new DuplicateResourceException("Email já cadastrado para outro usuário!");
+            }
+            if (repository.existsByTaxIdAndIdNot(dto.taxId(), id)) {
+                throw new DuplicateResourceException("CPF/CNPJ já cadastrado para outro usuário!");
+            }
+        } else {
+            if (repository.existsByEmail(dto.email())) {
+                throw new DuplicateResourceException("Email já cadastrado!");
+            }
+            if (repository.existsByTaxId(dto.taxId())) {
+                throw new DuplicateResourceException("CPF/CNPJ já cadastrado!");
+            }
+        }
+
 
         entity.setName(dto.name());
         entity.setEmail(dto.email());

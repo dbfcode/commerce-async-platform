@@ -1,13 +1,18 @@
 package com.orderflow.ecommerce.dtos;
 
 import com.orderflow.ecommerce.entities.User;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 
 public record UserDto(
         Long id,
+        @NotBlank(message = "Campo requerido")
         String name,
+        @NotBlank(message = "Campo requerido")
         String email,
+        @NotBlank(message = "Campo requerido")
         String password,
         String taxId,
         String stateRegistration,
@@ -15,13 +20,21 @@ public record UserDto(
         LocalDate birthDate,
         Boolean taxpayer,
         String googleId,
+        @Size(max = 40, message = "Máximo 40 caracteres")
         String street,
+        @Size(max = 40, message = "Máximo 40 caracteres")
         String complement,
+        @Size(max = 10, message = "Máximo 10 caracteres")
         String number,
+        @Size(max = 40, message = "Máximo 40 caracteres")
         String neighborhood,
+        @Size(max = 40, message = "Máximo 40 caracteres")
         String city,
+        @Size(max = 40, message = "Máximo 40 caracteres")
         String country,
+        @Size(max = 2, message = "Máximo 2 caracteres")
         String state,
+        @Size(max = 10, message = "Máximo 10 caracteres")
         String zipCode
 ) {
     public UserDto(User entity) {
