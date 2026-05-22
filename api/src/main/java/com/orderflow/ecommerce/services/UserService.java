@@ -1,6 +1,7 @@
 package com.orderflow.ecommerce.services;
 
 import com.orderflow.ecommerce.dtos.UserDto;
+import com.orderflow.ecommerce.entities.User;
 import com.orderflow.ecommerce.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -28,5 +29,34 @@ public class UserService {
     @Transactional(readOnly = true)
     public Page<UserDto> findAllPaged(Pageable pageable) {
         return repository.findAll(pageable).map(UserDto::new);
+    }
+
+    @Transactional
+    public UserDto insert(UserDto dto) {
+        return new UserDto(saveEntity(dto));
+    }
+
+    private User saveEntity(UserDto dto) {
+        User entity = new User();
+
+        entity.setName(dto.name());
+        entity.setEmail(dto.email());
+        entity.setPassword(dto.password());
+        entity.setTaxId(dto.taxId());
+        entity.setStateRegistration(dto.stateRegistration());
+        entity.setPhone(dto.phone());
+        entity.setBirthDate(dto.birthDate());
+        entity.setTaxpayer(dto.taxpayer());
+        entity.setGoogleId(dto.googleId());
+        entity.setStreet(dto.street());
+        entity.setComplement(dto.complement());
+        entity.setNumber(dto.number());
+        entity.setNeighborhood(dto.neighborhood());
+        entity.setCity(dto.city());
+        entity.setCountry(dto.country());
+        entity.setState(dto.state());
+        entity.setZipCode(dto.zipCode());
+
+        return repository.save(entity);
     }
 }

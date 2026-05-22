@@ -7,11 +7,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.util.UUID;
+import java.net.URI;
 
 @Controller
 @RequestMapping("/users")
@@ -33,5 +32,13 @@ public class UserController {
     @GetMapping(params = "email")
     public ResponseEntity<UserDto> findByEmail(String email) {
         return ResponseEntity.ok().body(service.findByEmail(email));
+    }
+
+    @PostMapping
+    public ResponseEntity<UserDto> insert(@RequestBody UserDto dto) {
+        dto = service.insert(dto);
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+                .buildAndExpand(dto.id()).toUri();
+        return ResponseEntity.created(uri).body(dto);
     }
 }

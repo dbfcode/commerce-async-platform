@@ -9,7 +9,7 @@ import java.time.LocalDate;
 @Table(name = "tb_user")
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
 public class User {
