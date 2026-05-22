@@ -1,6 +1,6 @@
-# Task de onboarding — colaborador iniciante
+# Task de onboarding — colaborador iniciante (backend Java)
 
-Este ficheiro descreve **uma única tarefa pequena e fechada** para quem está a começar no repositório. O objetivo é maximizar aprendizagem com **mínimo risco** e **revisão rápida** (sem alterar backend, sem novas dependências).
+Este ficheiro descreve **uma única tarefa pequena e fechada** em **Spring Boot / Java** para quem está a começar no repositório. O objetivo é aprender o fluxo controller → repositório → resposta JSON, com **revisão rápida** (sem frontend, sem novas dependências Maven).
 
 ---
 
@@ -10,30 +10,36 @@ Este ficheiro descreve **uma única tarefa pequena e fechada** para quem está a
 
 | Parte | Pasta | Estado atual (resumo) |
 |--------|--------|-------------------------|
-| **API** | `api/` | Spring Boot: CRUD de categorias e produtos, entidades de pedido, RabbitMQ (publicação e consumidores simulados), Swagger, tratamento global de erros. |
-| **Web** | `web/` | React 19 + TypeScript + Tailwind: página mínima que só testa `GET /test/ping` através de `apiGet` em `web/src/lib/api.ts`. |
+| **API** | `api/` | Spring Boot 3.2 / Java 21: CRUD de categorias e produtos, pedidos em JPA, RabbitMQ (eventos e consumidores simulados), Swagger via interfaces `*ControllerDocs`, `GlobalExceptionHandler`. |
+| **Web** | `web/` | React mínima (não faz parte desta task). |
 
-O README principal na raiz (`README.md`) tem diagramas C4, endpoints e roadmap — vale a pena ler pelo menos a secção **REST API Endpoints** e **Quick Start**.
+Lê `AGENTS.md` para correr Postgres + RabbitMQ e a API com perfil `local`. O `README.md` na raiz resume endpoints e arquitetura.
 
 ---
 
 ## O que já está implementado (relevante para esta task)
 
-- Endpoint **`GET /categories`** — devolve uma lista JSON de categorias com campos `id` e `name` (ver `CategoryController` e entidade `Category` no backend).
-- Cliente HTTP no frontend: `getApiBaseUrl()` e `apiGet<T>()` em `web/src/lib/api.ts`.
-- Padrão de UI e estado em `web/src/App.tsx` (botão, `loading`, mensagem de resultado / erro).
-
-Não é necessário mexer na API nem no Docker para concluir a task, desde que o ambiente local já consiga correr a Web e a API (ver `AGENTS.md`).
+- `CategoryController` em `GET /categories` e `GET /categories/{id}`, etc., implementa `CategoryControllerDocs` (anotações OpenAPI na interface).
+- `CategoryRepository` é uma `JpaRepository` — já expõe o método **`count()`** (contagem de linhas na tabela de categorias).
+- DTOs como **records** com `@Schema` para o Swagger: exemplo `PingResponse` em `api/src/main/java/com/orderflow/ecommerce/dtos/PingResponse.java`.
 
 ---
 
 ## Objetivo da task (entregável)
 
-**Mostrar a lista de categorias na aplicação web**, de forma semelhante ao botão que já chama `/test/ping`:
+Expor um endpoint **somente leitura** que devolve **quantas categorias** existem na base de dados:
 
-1. Adicionar um controlo na interface (por exemplo um botão **“Carregar categorias”**) que, ao clicar, chama **`GET /categories`** usando **`apiGet`** (o caminho deve ser `'/categories'` — o prefixo `/api` já vem da base URL).
-2. Apresentar o resultado na página: por exemplo uma lista simples com **`id`** e **`name`** de cada categoria (lista HTML ou texto formatado, desde que legível).
-3. Tratar erro de rede / HTTP da mesma forma que o exemplo do ping (mensagem ao utilizador, sem deixar a app “presa” em loading).
+| Método | Caminho | Resposta JSON (exemplo) |
+|--------|---------|-------------------------|
+| `GET` | `/categories/count` | `{"count": 3}` |
+
+### Implementação esperada (alto nível)
+
+1. **Novo DTO** (record) em `api/src/main/java/com/orderflow/ecommerce/dtos/`, por exemplo `CategoryCountResponse`, com um campo numérico para a contagem (nome do campo JSON: **`count`**). Incluir anotações `@Schema` nos campos, no estilo de `PingResponse`, para o Swagger documentar bem o contrato.
+2. **`CategoryControllerDocs`**: adicionar um método abstrato com `@Operation` + `@ApiResponse` 200 descrevendo o novo DTO (igual ao padrão dos métodos já documentados na mesma interface).
+3. **`CategoryController`**: implementar o método da interface com `@GetMapping` no caminho **`/count`** (o prefixo `/categories` já vem do `@RequestMapping` da classe). O corpo do método deve usar **`repository.count()`** e devolver `ResponseEntity` com status 200 e o record preenchido.
+
+Não é obrigatório escrever testes automatizados nesta task; se adicionares, mantém-nos **mínimos** (por exemplo um teste `@WebMvcTest` ou um teste de integração simples) e não aumentes o escopo além do endpoint.
 
 ---
 
@@ -41,49 +47,57 @@ Não é necessário mexer na API nem no Docker para concluir a task, desde que o
 
 ### Fazer (apenas isto)
 
-- Alterar **só** ficheiros dentro de `web/src/` (tipicamente `App.tsx` e, se quiser organizar tipos, um ficheiro pequeno ao lado — opcional).
-- Reutilizar **`apiGet`**; não criar outro cliente HTTP.
-- Manter o estilo **Tailwind** alinhado com o que já existe na página (cores, espaçamentos, tipografia).
+- Alterar **só** código dentro de `api/src/main/java/com/orderflow/ecommerce/` (tipicamente `controllers/`, `controllers/docs/` e `dtos/`).
+- Seguir o **mesmo estilo** dos controladores existentes (imports, `ResponseEntity`, anotações Spring).
+- Garantir que o endpoint aparece no **Swagger UI** com descrição legível.
 
 ### Não fazer (evita PRs difíceis de rever)
 
-- Não alterar `api/`, `docker-compose.yml`, `pom.xml`, `package.json` (sem novas dependências).
-- Não implementar criar/editar/apagar categorias nesta task (só leitura / GET).
-- Não adicionar autenticação, rotas, estado global (Redux, etc.) ou bibliotecas UI.
-- Não mudar a configuração do proxy Vite nem variáveis de ambiente, salvo indicação explícita da equipa.
+- Não alterar `web/`, `docker-compose.yml`, nem ficheiros em `api/src/main/resources/` salvo se for estritamente necessário (nesta task **não** deve ser).
+- Não adicionar dependências ao `pom.xml`.
+- Não implementar paginação, cache, segurança por roles, nem alterar regras de negócio das categorias existentes.
+- Não mudar o contrato dos endpoints CRUD já existentes.
 
 ---
 
 ## Passos sugeridos (ordem)
 
-1. Clonar o repositório e seguir `AGENTS.md` para subir Postgres + RabbitMQ e a API com perfil `local`; na pasta `web/` correr `npm install` e `npm run dev`.
-2. Confirmar no browser ou no Swagger que `GET http://localhost:8080/categories` devolve JSON (a Web usa o proxy `/api`, por isso o pedido partirá de `http://localhost:5173/api/categories`).
-3. Abrir `web/src/App.tsx` e `web/src/lib/api.ts` e perceber o fluxo do botão do ping.
-4. Implementar o botão / lista conforme o objetivo acima.
-5. Correr **`cd web && npm run lint`** e **`cd web && npm run build`** e corrigir o que falhar **antes** de abrir o PR.
+1. Subir infra e API com perfil `local` (ver `AGENTS.md`).
+2. Estudar `CategoryController`, `CategoryControllerDocs` e `PingResponse`.
+3. Criar o record DTO + assinatura em `CategoryControllerDocs` + implementação em `CategoryController`.
+4. Validar manualmente no Swagger: `GET /categories/count` devolve JSON com `count` coerente (cria ou apaga categorias com os endpoints já existentes para ver o número mudar).
+5. Correr **`cd api && chmod +x mvnw 2>/dev/null; ./mvnw test`** e corrigir falhas **antes** de abrir o PR.
 
 ---
 
 ## Critérios de aceite (checklist para o revisor)
 
-- [ ] Com API a correr e categorias na base de dados (ou após criar uma categoria via Swagger `POST /categories`), a página mostra a lista devolvida por `GET /categories`.
-- [ ] Existe feedback de **loading** e de **erro** (comportamento previsível).
-- [ ] `npm run lint` e `npm run build` na pasta `web/` passam sem erros.
-- [ ] Diff limitado ao frontend (`web/src/`), sem ficheiros acidentais nem reformatações massivas de código não relacionado.
+- [ ] `GET /categories/count` responde **200** e corpo JSON com campo **`count`** (número inteiro não negativo).
+- [ ] O valor de **`count`** corresponde ao **`repository.count()`** (ou seja, à tabela de categorias).
+- [ ] Swagger mostra o novo endpoint na secção **Category** com resposta documentada.
+- [ ] `./mvnw test` na pasta `api/` passa.
+- [ ] Diff pequeno e focado (sem reformatação de ficheiros inteiros nem alterações não relacionadas).
+
+---
+
+## Nota técnica (caminho `/categories/count`)
+
+O controlador já tem `GET /categories/{id}`. Em Spring Boot 3.x, o mapeamento **literal** `/categories/count` deve conviver com `/{id}` sem tratar a palavra `count` como ID. Se durante os testes o pedido a `/categories/count` for incorretamente tratado como `/{id}`, para **esta task** basta alinhar com o revisor um caminho alternativo sem ambiguidade (por exemplo prefixo extra); o importante é manter o contrato JSON com **`count`**.
 
 ---
 
 ## Git e mensagens (regra do repositório)
 
-- Branch: seguir o padrão do projeto descrito no `README.md` (ex.: `feat/web-list-categories`).
-- Commits em **inglês**, **minúsculas**, **imperativo**, estilo Conventional Commits, por exemplo: `feat(web): list categories on home page`.
+- Branch: padrão do `README.md` da raiz (ex.: `feat/categoria-category-count-endpoint`).
+- Commits em **inglês**, **minúsculas**, **imperativo**, Conventional Commits, por exemplo: `feat(categoria): add category count endpoint`.
 
 ---
 
 ## Referência rápida de ficheiros
 
-- Página atual: `web/src/App.tsx`
-- Cliente API: `web/src/lib/api.ts`
-- Endpoint no backend (só leitura para perceber o JSON): `api/src/main/java/com/orderflow/ecommerce/controllers/CategoryController.java`
+- Controller: `api/src/main/java/com/orderflow/ecommerce/controllers/CategoryController.java`
+- Documentação OpenAPI: `api/src/main/java/com/orderflow/ecommerce/controllers/docs/CategoryControllerDocs.java`
+- Exemplo de DTO record: `api/src/main/java/com/orderflow/ecommerce/dtos/PingResponse.java`
+- Repositório: `api/src/main/java/com/orderflow/ecommerce/repositories/CategoryRepository.java`
 
-Quando terminar, abre um PR pequeno e menciona este ficheiro no corpo do PR para o revisor saber que cumpriste o escopo definido aqui.
+Quando terminar, abre um PR pequeno e referencia este ficheiro no corpo do PR para o revisor validar o checklist acima.
