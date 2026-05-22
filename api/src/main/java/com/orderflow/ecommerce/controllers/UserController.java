@@ -41,4 +41,9 @@ public class UserController {
                 .buildAndExpand(dto.id()).toUri();
         return ResponseEntity.created(uri).body(dto);
     }
+
+    @PutMapping(value = "/{id}")
+    public ResponseEntity<UserDto> update(@PathVariable Long id, @RequestBody UserDto dto) {
+        return ResponseEntity.ok().body(service.update(id, dto));
+    }
 }

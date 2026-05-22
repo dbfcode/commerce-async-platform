@@ -3,6 +3,7 @@ package com.orderflow.ecommerce.services;
 import com.orderflow.ecommerce.dtos.UserDto;
 import com.orderflow.ecommerce.entities.User;
 import com.orderflow.ecommerce.repositories.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,11 +34,23 @@ public class UserService {
 
     @Transactional
     public UserDto insert(UserDto dto) {
-        return new UserDto(saveEntity(dto));
+        return new UserDto(saveEntity(null, dto));
     }
 
-    private User saveEntity(UserDto dto) {
+    @Transactional
+    public UserDto update(Long id, UserDto dto) {
+        try {
+            return new UserDto(saveEntity(id, dto));
+        }
+        catch (EntityNotFoundException e) {
+            throw new NoSuchElementException("Id not found " + id);
+        }
+    }
+
+    private User saveEntity(Long id, UserDto dto) {
         User entity = new User();
+
+        if(id != null) entity = repository.getReferenceById(id);
 
         entity.setName(dto.name());
         entity.setEmail(dto.email());
