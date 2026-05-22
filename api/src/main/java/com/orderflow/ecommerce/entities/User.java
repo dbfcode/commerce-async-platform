@@ -32,7 +32,7 @@ public class User {
     private String taxId;
 
     /**
-     * Estadual registration (IE)
+     * State registration (IE)
      */
     @Column(length = 30)
     private String stateRegistration;
@@ -43,7 +43,7 @@ public class User {
     /**
      * Used in Invoices (NF-e)
      */
-    private Boolean taxpayerType;
+    private Boolean taxpayer;
 
     /**
      * Google API
