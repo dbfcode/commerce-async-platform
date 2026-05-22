@@ -5,10 +5,15 @@ import com.orderflow.ecommerce.entities.User;
 import com.orderflow.ecommerce.repositories.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.NoSuchElementException;
 
@@ -44,6 +49,16 @@ public class UserService {
         }
         catch (EntityNotFoundException e) {
             throw new NoSuchElementException("Id not found " + id);
+        }
+    }
+
+    @Transactional
+    public void delete(Long id) {
+        try {
+            repository.deleteById(id);
+        }
+        catch (DataIntegrityViolationException e) {
+            throw new DataIntegrityViolationException("Integrity violation");
         }
     }
 
