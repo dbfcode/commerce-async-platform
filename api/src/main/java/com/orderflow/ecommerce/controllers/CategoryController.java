@@ -1,59 +1,62 @@
 package com.orderflow.ecommerce.controllers;
 
 import com.orderflow.ecommerce.controllers.docs.CategoryControllerDocs;
-import com.orderflow.ecommerce.entities.Category;
-import com.orderflow.ecommerce.repositories.CategoryRepository;
+import com.orderflow.ecommerce.dtos.CategoryRequest;
+import com.orderflow.ecommerce.dtos.CategoryResponse;
+import com.orderflow.ecommerce.services.CategoryService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping(value = "/categories")
 public class CategoryController implements CategoryControllerDocs {
 
     @Autowired
-    private CategoryRepository repository;
+    private CategoryService categoryService;
 
     @Override
     @GetMapping
-    public ResponseEntity<List<Category>> findAll() {
-        return ResponseEntity.ok().body(repository.findAll());
+    public ResponseEntity<Page<CategoryResponse>> findAll(
+            @RequestParam(required = false) String name,
+            Pageable pageable
+    ) {
+        if (name != null && !name.isBlank()) {
+            return ResponseEntity.ok(categoryService.findByName(name, pageable));
+        }
+        return ResponseEntity.ok(categoryService.findAll(pageable));
     }
 
     @Override
     @GetMapping(value = "/{id}")
-    public ResponseEntity<Category> findById(@PathVariable Long id) {
-        Category obj = repository.findById(id)
-            .orElseThrow(() -> new NoSuchElementException("Categoria não encontrada com o ID: " + id));
-        return ResponseEntity.ok().body(obj);
+    public ResponseEntity<CategoryResponse> findById(@PathVariable Long id) {
+        return ResponseEntity.ok(categoryService.findById(id));
     }
 
     @Override
     @PostMapping
-    public ResponseEntity<Category> insert(@Valid @RequestBody Category obj) {
-        return ResponseEntity.ok().body(repository.save(obj));
+    public ResponseEntity<CategoryResponse> create(@Valid @RequestBody CategoryRequest request) {
+        CategoryResponse response = categoryService.create(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @Override
+    @PutMapping(value = "/{id}")
+    public ResponseEntity<CategoryResponse> update(
+            @PathVariable Long id,
+            @Valid @RequestBody CategoryRequest request
+    ) {
+        return ResponseEntity.ok(categoryService.update(id, request));
     }
 
     @Override
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        repository.deleteById(id);
+        categoryService.delete(id);
         return ResponseEntity.noContent().build();
-    }
-
-    @Override
-    @PutMapping(value = "/{id}")
-    public ResponseEntity<Category> update(
-        @PathVariable Long id,
-        @Valid @RequestBody Category obj
-    ) {
-        Category entity = repository.findById(id)
-            .orElseThrow(() -> new NoSuchElementException("Categoria não encontrada para atualizar"));
-        entity.setName(obj.getName());
-        return ResponseEntity.ok().body(repository.save(entity));
     }
 }
