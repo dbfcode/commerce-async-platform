@@ -13,5 +13,10 @@ public interface ProductMapper {
     ProductResponse toResponse(Product product);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "name", source = "request.name")
+    @Mapping(target = "description", source = "request.description")
+    @Mapping(target = "price", source = "request.price")
+    @Mapping(target = "stockQuantity", source = "request.stockQuantity")
+    @Mapping(target = "category", source = "category")
     Product toEntity(ProductRequest request, Category category);
 }
