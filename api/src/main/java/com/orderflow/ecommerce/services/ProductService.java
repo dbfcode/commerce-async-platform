@@ -1,5 +1,6 @@
 package com.orderflow.ecommerce.services;
 
+import com.orderflow.ecommerce.dtos.ProductFilter;
 import com.orderflow.ecommerce.dtos.ProductRequest;
 import com.orderflow.ecommerce.dtos.ProductResponse;
 import com.orderflow.ecommerce.entities.Category;
@@ -7,6 +8,7 @@ import com.orderflow.ecommerce.entities.Product;
 import com.orderflow.ecommerce.mappers.ProductMapper;
 import com.orderflow.ecommerce.repositories.CategoryRepository;
 import com.orderflow.ecommerce.repositories.ProductRepository;
+import com.orderflow.ecommerce.specifications.ProductSpecification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,8 +42,8 @@ public class ProductService {
         return productMapper.toResponse(saved);
     }
 
-    public Page<ProductResponse> findAll(Pageable pageable) {
-        return productRepository.findAll(pageable)
+    public Page<ProductResponse> findAll(ProductFilter filter, Pageable pageable) {
+        return productRepository.findAll(ProductSpecification.withFilters(filter), pageable)
                 .map(productMapper::toResponse);
     }
 

@@ -1,6 +1,7 @@
 package com.orderflow.ecommerce.controllers;
 
 import com.orderflow.ecommerce.controllers.docs.ProductControllerDocs;
+import com.orderflow.ecommerce.dtos.ProductFilter;
 import com.orderflow.ecommerce.dtos.ProductRequest;
 import com.orderflow.ecommerce.dtos.ProductResponse;
 import com.orderflow.ecommerce.entities.Product;
@@ -26,8 +27,11 @@ public class ProductController implements ProductControllerDocs {
 
     @Override
     @GetMapping
-    public ResponseEntity<Page<ProductResponse>> findAll(Pageable pageable) {
-        return ResponseEntity.ok(productService.findAll(pageable));
+    public ResponseEntity<Page<ProductResponse>> findAll(
+            @ModelAttribute ProductFilter filter,
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(productService.findAll(filter, pageable));
     }
 
     @Override

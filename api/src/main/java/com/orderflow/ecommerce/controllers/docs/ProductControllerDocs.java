@@ -1,6 +1,7 @@
 package com.orderflow.ecommerce.controllers.docs;
 
 import com.orderflow.ecommerce.dtos.ErrorResponse;
+import com.orderflow.ecommerce.dtos.ProductFilter;
 import com.orderflow.ecommerce.dtos.ProductRequest;
 import com.orderflow.ecommerce.dtos.ProductResponse;
 import com.orderflow.ecommerce.entities.Product;
@@ -23,8 +24,13 @@ public interface ProductControllerDocs {
 
     @Operation(
         summary = "Lista todos os produtos",
-        description = "Retorna uma lista paginada de todos os produtos existentes no sistema",
+        description = "Retorna uma lista paginada de todos os produtos. Todos os filtros são opcionais",
         parameters = {
+            @Parameter(name = "name", description = "Filtro parcial por nome do produto", example = "notebook"),
+            @Parameter(name = "categoryName", description = "Filtro parcial por nome da categoria", example = "Eletrônicos"),
+            @Parameter(name = "minPrice", description = "Preço mínimo", example = "1000.00"),
+            @Parameter(name = "maxPrice", description = "Preço máximo", example = "5000.00"),
+            @Parameter(name = "inStock", description = "Apenas produtos com estoque disponível", example = "true"),
             @Parameter(name = "page", description = "Número da página (começa em 0)", example = "0"),
             @Parameter(name = "size", description = "Quantidade de itens por página", example = "10"),
             @Parameter(name = "sort", description = "Campo e direção de ordenação", example = "name,asc")
@@ -37,7 +43,10 @@ public interface ProductControllerDocs {
             )
         }
     )
-    ResponseEntity<Page<ProductResponse>> findAll(@Parameter(hidden = true) Pageable pageable);
+    ResponseEntity<Page<ProductResponse>> findAll(
+            @Parameter(hidden = true) ProductFilter filter,
+            @Parameter(hidden = true) Pageable pageable
+    );
 
     @Operation(
         summary = "Obtém produto por id",
