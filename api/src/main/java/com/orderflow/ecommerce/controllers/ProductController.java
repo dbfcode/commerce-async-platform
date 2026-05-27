@@ -1,10 +1,17 @@
 package com.orderflow.ecommerce.controllers;
 
 import com.orderflow.ecommerce.controllers.docs.ProductControllerDocs;
+import com.orderflow.ecommerce.dtos.ProductFilter;
+import com.orderflow.ecommerce.dtos.ProductRequest;
+import com.orderflow.ecommerce.dtos.ProductResponse;
 import com.orderflow.ecommerce.entities.Product;
 import com.orderflow.ecommerce.repositories.ProductRepository;
+import com.orderflow.ecommerce.services.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,47 +23,43 @@ import java.util.NoSuchElementException;
 public class ProductController implements ProductControllerDocs {
 
     @Autowired
-    private ProductRepository repository;
+    private ProductService productService;
 
     @Override
     @GetMapping
-    public ResponseEntity<List<Product>> findAll() {
-        return ResponseEntity.ok().body(repository.findAll());
+    public ResponseEntity<Page<ProductResponse>> findAll(
+            @ModelAttribute ProductFilter filter,
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(productService.findAll(filter, pageable));
     }
 
     @Override
     @GetMapping(value = "/{id}")
-    public ResponseEntity<Product> findById(@PathVariable Long id) {
-        Product obj = repository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Produto não encontrado"));
-        return ResponseEntity.ok().body(obj);
+    public ResponseEntity<ProductResponse> findById(@PathVariable Long id) {
+        return ResponseEntity.ok(productService.findById(id));
     }
 
     @Override
     @PostMapping
-    public ResponseEntity<Product> insert(@Valid @RequestBody Product obj) {
-        return ResponseEntity.ok().body(repository.save(obj));
+    public ResponseEntity<ProductResponse> create(@Valid @RequestBody ProductRequest request) {
+        ProductResponse response = productService.create(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @Override
+    @PutMapping(value = "/{id}")
+    public ResponseEntity<ProductResponse> update(
+            @PathVariable Long id,
+            @Valid @RequestBody ProductRequest request
+    ) {
+        return ResponseEntity.ok(productService.update(request, id));
     }
 
     @Override
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        repository.deleteById(id);
+        productService.delete(id);
         return ResponseEntity.noContent().build();
-    }
-
-    @Override
-    @PutMapping(value = "/{id}")
-    public ResponseEntity<Product> update(@PathVariable Long id, @Valid @RequestBody Product obj) {
-        Product entity = repository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Produto não encontrado para atualizar"));
-
-        entity.setName(obj.getName());
-        entity.setDescription(obj.getDescription());
-        entity.setPrice(obj.getPrice());
-        entity.setStockQuantity(obj.getStockQuantity());
-        entity.setCategory(obj.getCategory());
-
-        return ResponseEntity.ok().body(repository.save(entity));
     }
 }

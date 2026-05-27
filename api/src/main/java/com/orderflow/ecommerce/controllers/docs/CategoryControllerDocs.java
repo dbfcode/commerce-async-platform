@@ -1,7 +1,8 @@
 package com.orderflow.ecommerce.controllers.docs;
 
+import com.orderflow.ecommerce.dtos.CategoryRequest;
+import com.orderflow.ecommerce.dtos.CategoryResponse;
 import com.orderflow.ecommerce.dtos.ErrorResponse;
-import com.orderflow.ecommerce.entities.Category;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -10,7 +11,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -18,17 +22,26 @@ import java.util.List;
 public interface CategoryControllerDocs {
 
     @Operation(
-        summary = "Lista todas as categorias",
-        description = "Retorna uma lista de todas as categorias existentes no sistema.",
-        responses = {
-            @ApiResponse(
-                responseCode = "200",
-                description = "Lista obtida com sucesso",
-                content = @Content(array = @ArraySchema(schema = @Schema(implementation = Category.class)))
-            )
-        }
+            summary = "Lista todas as categorias",
+            description = "Retorna uma lista paginada de todas as categorias. Filtra por nome se o parâmetro 'name' for informado.",
+            parameters = {
+                    @Parameter(name = "name", description = "Filtro opcional por nome da categoria", required = false, example = "Eletrônicos"),
+                    @Parameter(name = "page", description = "Número da página (começa em 0)", example = "0"),
+                    @Parameter(name = "size", description = "Quantidade de itens por página", example = "10"),
+                    @Parameter(name = "sort", description = "Campo e direção de ordenação", example = "name,asc")
+            },
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Lista obtida com sucesso",
+                            content = @Content(schema = @Schema(implementation = CategoryResponse.class))
+                    )
+            }
     )
-    ResponseEntity<List<Category>> findAll();
+    ResponseEntity<Page<CategoryResponse>> findAll(
+            @Parameter(hidden = true) @RequestParam(required = false) String name,
+            @Parameter(hidden = true) Pageable pageable
+    );
 
     @Operation(
         summary = "Obtém categoria por id",
@@ -45,28 +58,28 @@ public interface CategoryControllerDocs {
             @ApiResponse(
                 responseCode = "200",
                 description = "Categoria encontrada",
-                content = @Content(schema = @Schema(implementation = Category.class))),
+                content = @Content(schema = @Schema(implementation = CategoryResponse.class))),
             @ApiResponse(
                 responseCode = "404",
                 description = "Categoria inexistente",
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
         }
     )
-    ResponseEntity<Category> findById(Long id);
+    ResponseEntity<CategoryResponse> findById(Long id);
 
     @Operation(
         summary = "Cria uma categoria",
-        description = "Insere uma nova categoria no sistema. O campo 'id' deve ser omitido no envio.",
+        description = "Insere uma nova categoria no sistema.",
         requestBody = @RequestBody(
             description = "Dados da categoria a ser criada",
             required = true,
-            content = @Content(schema = @Schema(implementation = Category.class))
+            content = @Content(schema = @Schema(implementation = CategoryRequest.class))
         ),
         responses = {
             @ApiResponse(
-                responseCode = "200",
-                description = "Categoria criada e persistida com sucesso",
-                content = @Content(schema = @Schema(implementation = Category.class))
+                responseCode = "201",
+                description = "Categoria criada com sucesso",
+                content = @Content(schema = @Schema(implementation = CategoryResponse.class))
             ),
             @ApiResponse(
                 responseCode = "400",
@@ -75,7 +88,40 @@ public interface CategoryControllerDocs {
             )
         }
     )
-    ResponseEntity<Category> insert(Category obj);
+    ResponseEntity<CategoryResponse> create(CategoryRequest request);
+
+    @Operation(
+            summary = "Atualiza o nome de uma categoria",
+            description = "Atualiza os dados de uma categoria existente com base no ID fornecido",
+            parameters = {
+                    @Parameter(
+                            name = "id",
+                            description = "Identificador numérico da categoria",
+                            required = true,
+                            example = "1"
+                    )
+            },
+            requestBody = @RequestBody(
+                    description = "Novos dados para atualização da categoria",
+                    required = true,
+                    content = @Content(schema = @Schema(implementation = CategoryRequest.class))
+            ),
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Categoria atualizada com sucesso",
+                            content = @Content(schema = @Schema(implementation = CategoryResponse.class))),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Corpo inválido ou falha de validação nos dados enviados",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Categoria inexistente ou não encontrada para o ID informado",
+                            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+            }
+    )
+    ResponseEntity<CategoryResponse> update(Long id, CategoryRequest request);
 
     @Operation(
         summary = "Remove categoria por id",
@@ -91,43 +137,14 @@ public interface CategoryControllerDocs {
         responses = {
             @ApiResponse(
                 responseCode = "204",
-                description = "Exclusão processada (idempotente se o registro não existir)",
+                description = "Categoria removida com sucesso",
                 content = @Content
-            )
-        }
-    )
-    ResponseEntity<Void> delete(Long id);
-
-    @Operation(
-        summary = "Atualiza o nome de uma categoria",
-        description = "Atualiza os dados de uma categoria existente com base no ID fornecido",
-        parameters = {
-            @Parameter(
-                name = "id",
-                description = "Identificador numérico da categoria",
-                required = true,
-                example = "1"
-            )
-        },
-        requestBody = @RequestBody(
-            description = "Novos dados para atualização da categoria",
-            required = true,
-            content = @Content(schema = @Schema(implementation = Category.class))
-        ),
-        responses = {
-            @ApiResponse(
-                responseCode = "200",
-                description = "Categoria atualizada com sucesso",
-                content = @Content(schema = @Schema(implementation = Category.class))),
-            @ApiResponse(
-                responseCode = "400",
-                description = "Corpo inválido ou falha de validação nos dados enviados",
-                content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            ),
             @ApiResponse(
                 responseCode = "404",
-                description = "Categoria inexistente ou não encontrada para o ID informado",
+                description = "Categoria não encontrada",
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
         }
     )
-    ResponseEntity<Category> update (Long id, Category obj);
+    ResponseEntity<Void> delete(Long id);
 }
