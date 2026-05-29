@@ -31,7 +31,7 @@ public class UserController {
     }
 
     @GetMapping(params = "email")
-    public ResponseEntity<UserDto> findByEmail(String email) {
+    public ResponseEntity<UserDto> findByEmail(@RequestParam String email) {
         return ResponseEntity.ok().body(service.findByEmail(email));
     }
 
@@ -45,8 +45,8 @@ public class UserController {
     }
 
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        service.delete(id);
+    public ResponseEntity<Void> delete(@PathVariable Long id, @RequestParam(required = false) boolean verify) {
+        service.delete(id, verify);
         return ResponseEntity.noContent().build();
     }
 

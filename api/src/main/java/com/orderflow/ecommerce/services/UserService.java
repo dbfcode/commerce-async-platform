@@ -50,8 +50,9 @@ public class UserService {
     }
 
     @Transactional
-    public void delete(Long id) {
+    public void delete(Long id, boolean verify) {
         try {
+            if (verify) repository.findById(id).orElseThrow(() -> new NoSuchElementException("User not found"));
             repository.deleteById(id);
         }
         catch (DataIntegrityViolationException e) {
@@ -78,7 +79,6 @@ public class UserService {
                 throw new DuplicateResourceException("CPF/CNPJ já cadastrado!");
             }
         }
-
 
         entity.setName(dto.name());
         entity.setEmail(dto.email());
