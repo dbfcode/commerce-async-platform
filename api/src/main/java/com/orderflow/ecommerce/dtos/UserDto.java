@@ -1,7 +1,9 @@
 package com.orderflow.ecommerce.dtos;
 
 import com.orderflow.ecommerce.entities.User;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
@@ -11,8 +13,13 @@ public record UserDto(
         @NotBlank(message = "Campo requerido")
         String name,
         @NotBlank(message = "Campo requerido")
+        @Email(message = "Email inválido")
         String email,
         @NotBlank(message = "Campo requerido")
+        @Pattern(
+                regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&]).{8,}$",
+                message = "A senha deve conter pelo menos 8 caracteres, incluindo letras maiúsculas, minúsculas, números e caracteres especiais"
+        )
         String password,
         String taxId,
         String stateRegistration,
