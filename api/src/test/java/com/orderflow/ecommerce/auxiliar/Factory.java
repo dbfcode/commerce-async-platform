@@ -11,7 +11,7 @@ public class Factory {
         user.setId(1L);
         user.setName("Bob");
         user.setEmail("bob@gmail.com");
-        user.setPassword("shh..secret");
+        user.setPassword("Shh..1secret");
         user.setTaxId("98765432101");
         user.setPhone("1198765432");
         user.setBirthDate(LocalDate.of(1985, 3, 20));
